@@ -22,7 +22,7 @@ export default async function Home() {
 
   return (
     <main className={"light"}>
-      <div className={"m-10 p-10 rounded-2xl shadow-xl sticky top-0 border border-gray-100 bg-white"}>
+      <div className={"m-3 md:m-10 p-10 rounded-2xl shadow-xl sticky top-0 border border-gray-100 bg-white"}>
         <h1 className={"text-2xl mb-3"}>新しくリンクを作成</h1>
         <input
           type={"text"}
@@ -35,20 +35,20 @@ export default async function Home() {
       </div>
       {data.map((link) => {
         return (
-          <div className={"mx-10 my-5 p-10 rounded-2xl shadow-xl border border-gray-100"} key={link.id}>
-            <div className={"flex items-center justify-between"}>
+          <div className={"mx-3 md:mx-10 my-5 p-10 rounded-2xl shadow-xl border border-gray-100"} key={link.id}>
+            <div className={"flex-row md:flex items-center justify-between"}>
               <div className={"w-3/4 flex-row items-center justify-between"}>
                 <div className={"flex items-center"}>
-                  <span className={"ml-3 text-2xl w-full mb-3"}>{link.shortUrl}</span>
+                  <span className={"text-2xl w-full mb-3"}>{link.shortUrl}</span>
                 </div>
                 <div className={"flex items-center"}>
-                  <span className={"ml-3 mb-1"}>{link.url}</span>
+                  <span className={"mb-1"}>{link.url}</span>
                 </div>
                 <div className={"flex items-center"}>
-                  <span className={"ml-3"}>{link.description}</span>
+                  <span>{link.description}</span>
                 </div>
               </div>
-              <div className={"w-1/2 flex items-center justify-end"}>
+              <div className={"md:w-1/2 w-full flex items-center justify-end"}>
                 <button
                   className={"py-1 px-3 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition"}>
                   コピー
