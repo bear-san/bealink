@@ -1,17 +1,23 @@
 'use client';
 import useSWR from "swr";
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json() as Promise<Link[]>);
+const linkFetcher = (url: string) => fetch(url).then((res) => res.json() as Promise<Link[]>);
+const metadataFetcher = (url: string) => fetch(url).then((res) => res.json() as Promise<Metadata>);
 
 type Link = {
   id: string;
   url: string;
-  short_url: string;
+  path: string;
   description: string;
 }
 
+type Metadata = {
+  link_host: string;
+}
+
 export default function Home() {
-  const {data, error, isLoading} = useSWR("/api/links", fetcher);
+  const {data, error, isLoading} = useSWR("/api/links", linkFetcher);
+  const {data: metadata} = useSWR("/api/metadata", metadataFetcher);
 
   return (
     <main className={"light"}>
@@ -32,7 +38,7 @@ export default function Home() {
             <div className={"flex-row md:flex items-center justify-between"}>
               <div className={"w-3/4 flex-row items-center justify-between"}>
                 <div className={"flex items-center"}>
-                  <span className={"text-2xl w-full mb-3"}>{link.short_url}</span>
+                  <span className={"text-2xl w-full mb-3"}>{`${metadata?.link_host}/${link.path}`}</span>
                 </div>
                 <div className={"flex items-center"}>
                   <span className={"mb-1"}>{link.url}</span>

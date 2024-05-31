@@ -7,6 +7,6 @@ type Link struct {
 
 type Values struct {
 	URL         string `json:"url" bson:"url"`
-	ShortURL    string `json:"short_url" bson:"short_url"`
+	Path        string `json:"path" bson:"path"`
 	Description string `json:"description" bson:"description"`
 }
