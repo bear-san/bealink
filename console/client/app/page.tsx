@@ -6,7 +6,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json() as Promise<
 type Link = {
   id: string;
   url: string;
-  shortUrl: string;
+  short_url: string;
   description: string;
 }
 
@@ -32,7 +32,7 @@ export default function Home() {
             <div className={"flex-row md:flex items-center justify-between"}>
               <div className={"w-3/4 flex-row items-center justify-between"}>
                 <div className={"flex items-center"}>
-                  <span className={"text-2xl w-full mb-3"}>{link.shortUrl}</span>
+                  <span className={"text-2xl w-full mb-3"}>{link.short_url}</span>
                 </div>
                 <div className={"flex items-center"}>
                   <span className={"mb-1"}>{link.url}</span>
