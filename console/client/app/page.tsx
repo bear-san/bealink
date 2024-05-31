@@ -1,14 +1,7 @@
-async function getLinks() {
-  // const response = await fetch("/api/links");
-  // const data: Link[] = await response.json();
-  return [
-    {id: "1", url: "https://google.com", shortUrl: "https://beal.ink/foobar", description: "Google"},
-    {id: "2", url: "https://twitter.com", shortUrl: "https://beal.ink/foobar", description: "Twitter"},
-    {id: "3", url: "https://facebook.com", shortUrl: "https://beal.ink/foobar", description: "Facebook"},
-    {id: "4", url: "https://instagram.com", shortUrl: "https://beal.ink/foobar", description: "Instagram"},
-    {id: "5", url: "https://youtube.com", shortUrl: "https://beal.ink/foobar", description: "YouTube"},
-  ];
-}
+'use client';
+import useSWR from "swr";
+
+const fetcher = (url: string) => fetch(url).then((res) => res.json() as Promise<Link[]>);
 
 type Link = {
   id: string;
@@ -17,8 +10,8 @@ type Link = {
   description: string;
 }
 
-export default async function Home() {
-  const data = await getLinks();
+export default function Home() {
+  const {data, error, isLoading} = useSWR("/api/links", fetcher);
 
   return (
     <main className={"light"}>
@@ -33,7 +26,7 @@ export default async function Home() {
           リンクを作成する！
         </button>
       </div>
-      {data.map((link) => {
+      {data?.map((link) => {
         return (
           <div className={"mx-3 md:mx-10 my-5 p-10 rounded-2xl shadow-xl border border-gray-100"} key={link.id}>
             <div className={"flex-row md:flex items-center justify-between"}>
