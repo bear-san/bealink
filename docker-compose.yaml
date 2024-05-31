@@ -1,0 +1,12 @@
+services:
+  reverse-proxy:
+    build:
+      context: ./debug-proxy
+    ports:
+      - "80:80"
+    volumes:
+      - ./debug-proxy/nginx.conf:/etc/nginx/conf.d/default.conf
+  db:
+    image: mongo:8.0-rc
+    ports:
+      - "27017:27017"
