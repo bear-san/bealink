@@ -1,8 +1,7 @@
 package link
 
 import (
-	"crypto/rand"
-	"errors"
+	"github.com/bear-san/bealink/console/server/pkg/random_string"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -19,7 +18,7 @@ func Create(req *gin.Context) {
 
 	if l.Path == "" {
 		var path string
-		path, err = MakeRandomStr(6)
+		path, err = random_string.Create(6)
 		if err != nil {
 			req.JSON(500, gin.H{"error": err.Error()})
 			return
@@ -44,22 +43,4 @@ func Create(req *gin.Context) {
 	insertedID = r.InsertedID.(primitive.ObjectID)
 
 	req.JSON(201, gin.H{"id": insertedID.Hex()})
-}
-
-func MakeRandomStr(digit uint32) (string, error) {
-	const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-
-	// 乱数を生成
-	b := make([]byte, digit)
-	if _, err := rand.Read(b); err != nil {
-		return "", errors.New("unexpected error...")
-	}
-
-	// letters からランダムに取り出して文字列を生成
-	var result string
-	for _, v := range b {
-		// index が letters の長さに収まるように調整
-		result += string(letters[int(v)%len(letters)])
-	}
-	return result, nil
 }

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/bear-san/bealink/console/server/internal/auth"
 	"github.com/bear-san/bealink/console/server/internal/link"
 	"github.com/gin-gonic/gin"
 	"os"
@@ -13,6 +14,10 @@ func main() {
 	linkGroup := apiGroup.Group("/links")
 	linkGroup.GET("/", link.List)
 	linkGroup.POST("/", link.Create)
+
+	authGroup := apiGroup.Group("/auth")
+	authGroup.GET("/login", auth.Login)
+	authGroup.GET("/callback", auth.Callback)
 
 	apiGroup.GET("/metadata", func(req *gin.Context) {
 		req.JSON(200, gin.H{
