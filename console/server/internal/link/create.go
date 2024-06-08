@@ -7,6 +7,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"net/url"
 )
 
 func Create(req *gin.Context) {
@@ -26,6 +27,12 @@ func Create(req *gin.Context) {
 	err = req.BindJSON(&l)
 	if err != nil {
 		req.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
+
+	_, err = url.ParseRequestURI(l.URL)
+	if l.URL == "" || err != nil {
+		req.JSON(400, gin.H{"error": "invalid URL"})
 		return
 	}
 

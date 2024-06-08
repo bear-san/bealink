@@ -1,5 +1,5 @@
 'use client';
-import useSWR, {mutate} from "swr";
+import useSWR from "swr";
 import React, {useState} from "react";
 import useSWRMutation from "swr/mutation";
 import {toast, ToastContainer} from "react-toastify";
