@@ -7,6 +7,8 @@ import (
 
 var client *redis.Client
 
+const sessionKeyFormat = "bealink-session-%s"
+
 func init() {
 	client = redis.NewClient(&redis.Options{
 		Addr: os.Getenv("REDIS_HOST"),

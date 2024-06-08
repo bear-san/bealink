@@ -1,6 +1,7 @@
 package link
 
 import (
+	"github.com/bear-san/bealink/console/server/internal/session"
 	"github.com/bear-san/bealink/console/server/pkg/random_string"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
@@ -9,8 +10,20 @@ import (
 )
 
 func Create(req *gin.Context) {
+	token := session.ExtractToken(req)
+	if token == nil {
+		req.JSON(401, gin.H{"error": "unauthorized"})
+		return
+	}
+
+	_, err := session.Validate(req.Request.Context(), *token)
+	if err != nil {
+		req.JSON(401, gin.H{"error": "unauthorized"})
+		return
+	}
+
 	l := Values{}
-	err := req.BindJSON(&l)
+	err = req.BindJSON(&l)
 	if err != nil {
 		req.JSON(400, gin.H{"error": err.Error()})
 		return

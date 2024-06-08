@@ -2,6 +2,7 @@ package link
 
 import (
 	"context"
+	"github.com/bear-san/bealink/console/server/internal/session"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -9,6 +10,18 @@ import (
 )
 
 func List(req *gin.Context) {
+	token := session.ExtractToken(req)
+	if token == nil {
+		req.JSON(401, gin.H{"error": "unauthorized"})
+		return
+	}
+
+	_, err := session.Validate(req.Request.Context(), *token)
+	if err != nil {
+		req.JSON(401, gin.H{"error": "unauthorized"})
+		return
+	}
+
 	ctx := req.Request.Context()
 	var links []Link
 	cur, err := collection.Find(ctx, bson.M{})

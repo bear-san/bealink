@@ -26,7 +26,7 @@ func Create(ctx context.Context, s *Session) (*string, error) {
 
 	}
 
-	return &token, client.Set(ctx, fmt.Sprintf("bealink-session-%s", sessionID), (string)(payload), time.Until(s.ExpiresAt)).Err()
+	return &token, client.Set(ctx, fmt.Sprintf(sessionKeyFormat, sessionID), (string)(payload), time.Until(s.ExpiresAt)).Err()
 }
 
 type Session struct {
