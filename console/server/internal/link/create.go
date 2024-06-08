@@ -8,6 +8,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"net/url"
+	"strings"
 )
 
 func Create(req *gin.Context) {
@@ -44,6 +45,11 @@ func Create(req *gin.Context) {
 			return
 		}
 		l.Path = path
+	}
+
+	if strings.Contains(l.Path, "/") {
+		req.JSON(400, gin.H{"error": "invalid path"})
+		return
 	}
 
 	cols := collection.FindOne(req.Request.Context(), bson.M{"path": l.Path})
