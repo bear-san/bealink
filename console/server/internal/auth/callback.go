@@ -24,16 +24,11 @@ func Callback(req *gin.Context) {
 		return
 	}
 
-	scheme := "http"
-	if req.Request.TLS != nil {
-		scheme = "https"
-	}
-
 	config := oauth2.Config{
 		ClientID:     os.Getenv("OIDC_CLIENT_ID"),
 		ClientSecret: os.Getenv("OIDC_CLIENT_SECRET"),
 		Endpoint:     client.Endpoint(),
-		RedirectURL:  fmt.Sprintf("%s://%s/api/auth/callback", scheme, req.Request.Host),
+		RedirectURL:  fmt.Sprintf("%s/api/auth/callback", os.Getenv("SERVER_HOST")),
 		Scopes:       []string{oidc.ScopeOpenID, "profile", "email"},
 	}
 

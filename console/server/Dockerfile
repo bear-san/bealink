@@ -11,4 +11,5 @@ RUN go build -o /app/server
 FROM gcr.io/distroless/base-debian12
 COPY --from=builder /app/server /app/server
 
-EXPOSE 8080
+EXPOSE 8000
+CMD ["/app/server"]

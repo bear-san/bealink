@@ -6,7 +6,15 @@ import {toast, ToastContainer} from "react-toastify";
 
 import 'react-toastify/dist/ReactToastify.css';
 
-const linkFetcher = (url: string) => fetch(url).then((res) => res.json() as Promise<Link[]>);
+const linkFetcher = async (url: string) => {
+  const res = await fetch(url);
+  if (!res.ok) {
+    window.location.href = "/api/auth/login";
+    return [] as Link[];
+  }
+
+  return await res.json() as Promise<Link[]>;
+}
 const metadataFetcher = (url: string) => fetch(url).then((res) => res.json() as Promise<Metadata>);
 
 type Link = {
