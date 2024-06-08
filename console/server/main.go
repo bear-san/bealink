@@ -14,6 +14,7 @@ func main() {
 	linkGroup := apiGroup.Group("/links")
 	linkGroup.GET("/", link.List)
 	linkGroup.POST("/", link.Create)
+	linkGroup.DELETE("/:lid", link.Delete)
 
 	authGroup := apiGroup.Group("/auth")
 	authGroup.GET("/login", auth.Login)

@@ -1,5 +1,5 @@
 'use client';
-import useSWR from "swr";
+import useSWR, {mutate} from "swr";
 import React, {useState} from "react";
 import useSWRMutation from "swr/mutation";
 import {toast, ToastContainer} from "react-toastify";
@@ -45,12 +45,36 @@ async function createLink(url: string, { arg }: { arg: Link }) {
   return res.json();
 }
 
+async function deleteLink(link: Link): Promise<boolean> {
+  const res = await fetch(`/api/links/${link.id}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!res.ok) {
+    toast("リンクの削除に失敗しました", {
+      type: "error",
+      position: "bottom-right"
+    });
+    return false;
+  }
+
+  toast("リンクを削除しました！", {
+    type: "success",
+    position: "bottom-right"
+  });
+
+  return true;
+}
+
 export default function Home() {
-  const {data, error, isLoading} = useSWR("/api/links", linkFetcher);
+  const {data, mutate} = useSWR("/api/links", linkFetcher);
   const {data: metadata} = useSWR("/api/metadata", metadataFetcher);
 
   const [link, setLink] = useState({} as Link);
-  const {trigger, isMutating} = useSWRMutation("/api/links", createLink);
+  const {trigger: createTrigger, isMutating} = useSWRMutation("/api/links", createLink);
 
   function onChange(e: React.ChangeEvent<HTMLInputElement>) {
     switch (e.target.formTarget) {
@@ -93,7 +117,8 @@ export default function Home() {
           className={`mt-3 w-full py-2 text-white rounded transition ${isMutating ? "bg-gray-400" : "bg-blue-500 hover:bg-blue-600"}`}
           onClick={async () => {
             console.log(link);
-            await trigger(link);
+            await createTrigger(link);
+            await mutate();
           }}>
           {isMutating ? "作成中..." : "リンクを作成する！"}
         </button>
@@ -119,7 +144,13 @@ export default function Home() {
                   コピー
                 </button>
                 <button
-                  className={"ml-2 py-1 px-3 bg-red-500 text-white rounded-md hover:bg-red-600 transition"}>
+                  className={"ml-2 py-1 px-3 bg-red-500 text-white rounded-md hover:bg-red-600 transition"}
+                  onClick={async _ => {
+                    const res = await deleteLink(link);
+                    if (res) {
+                      await mutate();
+                    }
+                  }}>
                   削除
                 </button>
               </div>
