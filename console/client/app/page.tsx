@@ -2,6 +2,9 @@
 import useSWR from "swr";
 import React, {useState} from "react";
 import useSWRMutation from "swr/mutation";
+import {toast, ToastContainer} from "react-toastify";
+
+import 'react-toastify/dist/ReactToastify.css';
 
 const linkFetcher = (url: string) => fetch(url).then((res) => res.json() as Promise<Link[]>);
 const metadataFetcher = (url: string) => fetch(url).then((res) => res.json() as Promise<Metadata>);
@@ -24,6 +27,19 @@ async function createLink(url: string, { arg }: { arg: Link }) {
     headers: {
       "Content-Type": "application/json",
     },
+  });
+
+  if (!res.ok) {
+    toast("リンクの作成に失敗しました", {
+      type: "error",
+      position: "bottom-right"
+    });
+    return res.json();
+  }
+
+  toast("リンクを作成しました！", {
+    type: "success",
+    position: "bottom-right"
   });
 
   return res.json();
@@ -111,6 +127,7 @@ export default function Home() {
           </div>
         );
       })}
+      <ToastContainer />
     </main>
   );
 }
