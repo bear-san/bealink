@@ -154,10 +154,10 @@ export default function Home() {
                 <div className={"flex items-center break-all"}>
                   <span className={"text-2xl w-full mb-3"}>{`${metadata?.link_host}/${link.path}`}</span>
                 </div>
-                <div className={"flex items-center"}>
+                <div className={"flex items-center break-all"}>
                   <span className={"mb-1"}>{link.url}</span>
                 </div>
-                <div className={"flex items-center"}>
+                <div className={"flex items-center break-all"}>
                   <span>{link.description}</span>
                 </div>
               </div>
