@@ -28,7 +28,7 @@ type Metadata = {
   link_host: string;
 }
 
-async function createLink(url: string, { arg }: { arg: Link }) {
+async function createLink(url: string, {arg}: { arg: Link }) {
   const res = await fetch(url, {
     method: "POST",
     body: JSON.stringify(arg),
@@ -75,6 +75,21 @@ async function deleteLink(link: Link): Promise<boolean> {
   });
 
   return true;
+}
+
+async function copyToClipboard(text: string) {
+  if (navigator.clipboard) {
+    await navigator.clipboard.writeText(text);
+    toast("クリップボードにコピーしました！", {
+      type: "success",
+      position: "bottom-right"
+    });
+  } else {
+    toast("クリップボードへのコピーに失敗しました", {
+      type: "error",
+      position: "bottom-right"
+    });
+  }
 }
 
 export default function Home() {
@@ -135,8 +150,8 @@ export default function Home() {
         return (
           <div className={"mx-3 md:mx-10 my-5 p-10 rounded-2xl shadow-xl border border-gray-100"} key={link.id}>
             <div className={"flex-row md:flex items-center justify-between"}>
-            <div className={"w-3/4 flex-row items-center justify-between"}>
-                <div className={"flex items-center"}>
+              <div className={"md:w-3/4 w-full flex-row items-center justify-between"}>
+                <div className={"flex items-center break-all"}>
                   <span className={"text-2xl w-full mb-3"}>{`${metadata?.link_host}/${link.path}`}</span>
                 </div>
                 <div className={"flex items-center"}>
@@ -146,9 +161,12 @@ export default function Home() {
                   <span>{link.description}</span>
                 </div>
               </div>
-              <div className={"md:w-1/2 w-full flex items-center justify-end"}>
+              <div className={"md:w-1/2 mt-5 md:mt-0 w-full flex items-center justify-end"}>
                 <button
-                  className={"py-1 px-3 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition"}>
+                  className={"py-1 px-3 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition"}
+                  onClick={async () => {
+                    await copyToClipboard(`${metadata?.link_host}/${link.path}`);
+                  }}>
                   コピー
                 </button>
                 <button
@@ -166,7 +184,7 @@ export default function Home() {
           </div>
         );
       })}
-      <ToastContainer />
+      <ToastContainer/>
     </main>
   );
 }
