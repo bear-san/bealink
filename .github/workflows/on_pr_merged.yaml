@@ -47,6 +47,7 @@ jobs:
         with:
           context: ./linker
           tags: ${{ vars.DOCKER_ACCOUNT_NAME }}/bealink-linker:${{ github.sha }}
+          push: true
   modify-k8s-yaml:
     needs:
       - build-console-client
@@ -84,3 +85,4 @@ jobs:
           gh pr create --title "Update docker image tag onto ${TAG}" --body "Update docker image tag onto ${TAG}" --base main --head update-bealink-to-${{ github.sha }} -r ${{ vars.INFRA_REVIEWER }}
         env:
           GITHUB_TOKEN: ${{ steps.auth_as_github_app.outputs.token }}
+          TAG: ${{ github.sha }}
