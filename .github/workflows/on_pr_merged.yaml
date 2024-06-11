@@ -74,10 +74,8 @@ jobs:
           GITHUB_TOKEN: ${{ steps.auth_as_github_app.outputs.token }}
       - name: chage docker image
         uses: mikefarah/yq@master
-        env:
-          TAG: ${{ github.sha }}
         with:
-          cmd: yq eval '.spec.sources[2].helm.valuesObject.targetRevision = ${TAG}' -i argocd/bealink.yaml
+          cmd: yq eval '.spec.sources[2].helm.valuesObject.targetRevision = ${{ github.sha }}' -i argocd/bealink.yaml
       - name: commit and push
         run: |
           git add -A
