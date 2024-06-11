@@ -13,8 +13,10 @@ jobs:
           node-version: 20
       - name: Install dependencies
         run: npm install
+        working-directory: ./console/client
       - name: Build
         run: npm run build
+        working-directory: ./console/client
       - name: Build Docker image
         env:
           DOCKER_ACCOUNT_NAME: ${{ env.DOCKER_ACCOUNT_NAME }}
