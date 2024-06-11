@@ -62,7 +62,7 @@ jobs:
           private_key: ${{ secrets.PRIVATE_KEY }}
       - uses: actions/checkout@v4
         with:
-          repository: 'bearsan/k8s-cluster-yaml'
+          repository: 'bear-san/k8s-cluster-yaml'
           token: ${{ steps.auth_as_github_app.outputs.token }}
       - name: create branch
         run: |
