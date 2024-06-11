@@ -63,6 +63,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: 'bearsan/k8s-cluster-yaml'
+          token: ${{ steps.auth_as_github_app.outputs.token }}
       - name: create branch
         run: |
           git config --global user.name "Actions User"
