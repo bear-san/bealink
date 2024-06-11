@@ -24,7 +24,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
       - name: ls
         run: ls
-        working-directory: ./console/client
+        working-directory: ./console/client/out
       - name: Build and Push Docker Image
         uses: docker/build-push-action@v5
         with:
