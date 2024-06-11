@@ -17,20 +17,18 @@ jobs:
       - name: Build
         run: npm run build
         working-directory: ./console/client
-      - name: Build Docker image
-        env:
-          DOCKER_ACCOUNT_NAME: ${{ vars.DOCKER_ACCOUNT_NAME }}
-        run: docker build --tag=${DOCKER_ACCOUNT_NAME}/bealink-console-client:${{ github.sha }} --file Dockerfile.gha .
-        working-directory: ./console/client
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-      - name: Push Docker image
-        env:
-          DOCKER_ACCOUNT_NAME: ${{ vars.DOCKER_ACCOUNT_NAME }}
-        run: docker push ${DOCKER_ACCOUNT_NAME}/bealink-console-client:${{ github.sha }}
+      - name: Build
+        uses: docker/build-push-action@v5
+        with:
+          context: ./console/client
+          file: ./console/client/Dockerfile.gha
+          tags: ${{ vars.DOCKER_ACCOUNT_NAME }}/bealink-console-client:${{ github.sha }}
+          push: true
   build-console-server:
     runs-on: ubuntu-latest
     steps:
@@ -40,14 +38,12 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-      - name: Build Docker image
-        env:
-          DOCKER_ACCOUNT_NAME: ${{ vars.DOCKER_ACCOUNT_NAME }}
-        run: docker build --tag=${DOCKER_ACCOUNT_NAME}/bealink-console-server:${{ github.sha }} ./console/server
-      - name: Push Docker image
-        env:
-          DOCKER_ACCOUNT_NAME: ${{ vars.DOCKER_ACCOUNT_NAME }}
-        run: docker push ${DOCKER_ACCOUNT_NAME}/bealink-console-server:${{ github.sha }}
+      - name: Build
+        uses: docker/build-push-action@v5
+        with:
+          context: ./console/server
+          tags: ${{ vars.DOCKER_ACCOUNT_NAME }}/bealink-console-server:${{ github.sha }}
+          push: true
   build-linker:
     runs-on: ubuntu-latest
     steps:
@@ -57,14 +53,11 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-      - name: Build Docker image
-        env:
-          DOCKER_ACCOUNT_NAME: ${{ vars.DOCKER_ACCOUNT_NAME }}
-        run: docker build --tag=${DOCKER_ACCOUNT_NAME}/bealink-linker:${{ github.sha }} --file ./linker/Dockerfile ./linker
-      - name: Push Docker image
-        env:
-          DOCKER_ACCOUNT_NAME: ${{ vars.DOCKER_ACCOUNT_NAME }}
-        run: docker push ${DOCKER_ACCOUNT_NAME}/bealink-linker:${{ github.sha }}
+      - name: Build
+        uses: docker/build-push-action@v5
+        with:
+          context: ./linker
+          tags: ${{ vars.DOCKER_ACCOUNT_NAME }}/bealink-linker:${{ github.sha }}
   modify-k8s-yaml:
     needs:
       - build-console-client
