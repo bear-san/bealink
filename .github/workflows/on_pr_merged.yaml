@@ -70,6 +70,8 @@ jobs:
           git config --global user.email "action@github.com"
           git checkout -b update-bealink-to-${{ github.sha }} main
           git push -u origin update-bealink-to-${{ github.sha }}
+        env:
+          GITHUB_TOKEN: ${{ steps.auth_as_github_app.outputs.token }}
       - name: chage docker image
         uses: mikefarah/yq@master
         env:
