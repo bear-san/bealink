@@ -3,6 +3,7 @@ package link
 import (
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
+	"net/url"
 )
 
 func Handle(req *gin.Context) {
@@ -15,7 +16,13 @@ func Handle(req *gin.Context) {
 		return
 	}
 
-	req.Redirect(301, l.URL)
+	decodedUrl, err := url.QueryUnescape(l.URL)
+	if err != nil {
+		req.String(500, "internal server error")
+		return
+	}
+
+	req.Redirect(301, decodedUrl)
 }
 
 type Link struct {
