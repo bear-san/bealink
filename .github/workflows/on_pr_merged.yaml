@@ -1,0 +1,100 @@
+on:
+  push:
+    branches:
+      - main
+jobs:
+  build-console-client:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install dependencies
+        run: npm install
+      - name: Build
+        run: npm run build
+      - name: Build Docker image
+        env:
+          DOCKER_ACCOUNT_NAME: ${{ env.DOCKER_ACCOUNT_NAME }}
+        run: docker build --tag=${DOCKER_ACCOUNT_NAME}/bealink-console-client:${{ github.sha }} --file ./client/Dockerfile.gha ./console/client
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Push Docker image
+        env:
+          DOCKER_ACCOUNT_NAME: ${{ vars.DOCKER_ACCOUNT_NAME }}
+        run: docker push ${DOCKER_ACCOUNT_NAME}/bealink-console-client:${{ github.sha }}
+  build-console-server:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Docker login
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Build Docker image
+        env:
+          DOCKER_ACCOUNT_NAME: ${{ vars.DOCKER_ACCOUNT_NAME }}
+        run: docker build --tag=${DOCKER_ACCOUNT_NAME}/bealink-console-server:${{ github.sha }} --file ./server/Dockerfile ./console/server
+      - name: Push Docker image
+        env:
+          DOCKER_ACCOUNT_NAME: ${{ vars.DOCKER_ACCOUNT_NAME }}
+        run: docker push ${DOCKER_ACCOUNT_NAME}/bealink-console-server:${{ github.sha }}
+  build-linker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Docker login
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Build Docker image
+        env:
+          DOCKER_ACCOUNT_NAME: ${{ vars.DOCKER_ACCOUNT_NAME }}
+        run: docker build --tag=${DOCKER_ACCOUNT_NAME}/bealink-linker:${{ github.sha }} --file ./linker/Dockerfile ./linker
+      - name: Push Docker image
+        env:
+          DOCKER_ACCOUNT_NAME: ${{ vars.DOCKER_ACCOUNT_NAME }}
+        run: docker push ${DOCKER_ACCOUNT_NAME}/bealink-linker:${{ github.sha }}
+  modify-k8s-yaml:
+    needs:
+      - build-console-client
+      - build-console-server
+      - build-linker
+    runs-on: ubuntu-latest
+    steps:
+      - name: auth-as-github-app
+        id: auth_as_github_app
+        uses: tibdex/github-app-token@v1
+        with:
+          app_id: ${{ secrets.APP_ID }}
+          private_key: ${{ secrets.PRIVATE_KEY }}
+      - uses: actions/checkout@v4
+        with:
+          repository: 'bearsan/k8s-cluster-yaml'
+      - name: create branch
+        run: |
+          git config --global user.name "Actions User"
+          git config --global user.email "action@github.com"
+          git checkout -b update-bealink-to-${{ github.sha }} main
+          git push -u origin update-bealink-to-${{ github.sha }}
+      - name: chage docker image
+        uses: mikefarah/yq@master
+        env:
+          TAG: ${{ github.sha }}
+        with:
+          cmd: yq eval '.spec.sources[2].helm.valuesObject.targetRevision = ${TAG}' -i argocd/bealink.yaml
+      - name: commit and push
+        run: |
+          git add -A
+          git commit -m "Update docker image tag onto ${TAG}"
+          git push origin update-bealink-to-${{ github.sha }}
+          gh pr create --title "Update docker image tag onto ${TAG}" --body "Update docker image tag onto ${TAG}" --base main --head update-bealink-to-${{ github.sha }} -r ${{ vars.INFRA_REVIEWER }}
+        env:
+          GITHUB_TOKEN: ${{ steps.auth_as_github_app.outputs.token }}
